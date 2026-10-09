@@ -1,0 +1,565 @@
+import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Mascot } from "page-mascot";
+import {
+  Check,
+  ArrowUpRight,
+  Activity,
+  Phone,
+  PhoneIncoming,
+  AudioLines,
+  ShieldCheck,
+  ArrowDownToLine,
+  ChevronDown,
+  FlaskConical,
+  RotateCcw,
+  Play,
+  Pause,
+  Info,
+  X,
+  CircleDot,
+  Clock,
+  Sparkles,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { PageTitle, Pill, Modal, Evidence, Regression, Note, EmptyState } from "./common";
+import { versions, internal } from "./data";
+const steps = [
+  "Define experiment",
+  "Pre-prod evals",
+  "Live test A/B/C",
+  "Analysis",
+  "Decision",
+  "Scale-up",
+];
+const results = [
+  {
+    metric: "Meeting Fixed rate",
+    values: ["11.5%", "13.2%", "9.8%"],
+    delta: "+1.7 pp",
+    significance: "Collecting evidence",
+    verdict: "B trending higher",
+    tone: "amber",
+    primary: true,
+  },
+  {
+    metric: "Call duration (seconds)",
+    values: ["74s", "69s", "81s"],
+    delta: "−5s",
+    significance: "Significant",
+    verdict: "B is better",
+    tone: "green",
+  },
+  {
+    metric: "Answer rate",
+    values: ["68.4%", "71.2%", "66.1%"],
+    delta: "+2.8 pp",
+    significance: "Significant",
+    verdict: "B is better",
+    tone: "green",
+  },
+];
+export function Pipeline() {
+  const [step, setStep] = useState(2);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [all, setAll] = useState(false);
+  const [demo, setDemo] = useState("idle");
+  const [evidence, setEvidence] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [view, setView] = useState("ready");
+  const [optional, setOptional] = useState(false);
+  useEffect(() => {
+    if (demo !== "running") return;
+    const id = setTimeout(() => {
+      setDemo("stopped");
+      toast("Simulated early stop · B’s traffic returned to A");
+    }, 2200);
+    return () => clearTimeout(id);
+  }, [demo]);
+  const stop = demo === "stopped";
+  const exportResults = () => {
+    const text =
+      "Metric,A,B,C\n" + results.map((r) => [r.metric, ...r.values].join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([text], { type: "text/csv" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "vani-sample-results.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Sample results exported");
+  };
+  return (
+    <>
+      <PageTitle
+        eyebrow="EXPERIMENT / LIVE PIPELINE"
+        title="Small tests. Better conversations."
+        description="Follow every version from an idea to evidence. Scale only what works."
+        action={
+          <div className="heading-actions">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setPaused(!paused);
+                toast(paused ? "Demo test resumed" : "Demo test paused");
+              }}
+            >
+              {paused ? <Play /> : <Pause />}
+              {paused ? "Resume test" : "Pause test"}
+            </Button>
+            <Button asChild>
+              <Link to="/scorecard">
+                View scorecard
+                <ArrowUpRight />
+              </Link>
+            </Button>
+          </div>
+        }
+      />
+      <div className="pipeline-map" aria-label="Experiment journey">
+        {steps.map((s, i) => (
+          <div
+            key={s}
+            className={`checkpoint ${i < 2 ? "done" : ""} ${step === i ? "selected" : ""}`}
+          >
+            <Button
+              variant="ghost"
+              title={s}
+              aria-label={s}
+              aria-pressed={step === i}
+              onClick={() => setStep(i)}
+            >
+              {i < 2 ? (
+                <Check size={14} />
+              ) : i === 2 ? (
+                <AudioLines size={14} />
+              ) : (
+                <span>{i + 1}</span>
+              )}
+            </Button>
+            <strong>{s}</strong>
+            <small>
+              {i < 2
+                ? "Completed"
+                : i === 2
+                  ? paused
+                    ? "Paused"
+                    : stop
+                      ? "Early stop"
+                      : "In progress"
+                  : "Pending"}
+            </small>
+          </div>
+        ))}
+      </div>
+      {step !== 2 ? (
+        <>
+          <div className="checkpoint-detail">
+            <div className="section-heading">
+              <h2>{steps[step]}</h2>
+              <Pill tone={step < 2 ? "green" : "neutral"}>
+                {step < 2 ? "Completed" : "Pending"}
+              </Pill>
+            </div>
+            {step === 0 ? (
+              <>
+                <p>
+                  Shorter opening vs baseline · A / B / C · GLID segments 0–3. The experiment
+                  definition was locked before traffic was allocated.
+                </p>
+                <div className="checkpoint-log">
+                  <span>Experiment created</span>
+                  <small>08 Oct, 10:00 IST</small>
+                </div>
+                <div className="checkpoint-log">
+                  <span>Hypothesis and guardrails reviewed</span>
+                  <Pill tone="green">Passed</Pill>
+                </div>
+                <Button asChild variant="outline">
+                  <Link to="/setup">
+                    Review definition
+                    <ArrowUpRight />
+                  </Link>
+                </Button>
+              </>
+            ) : step === 1 ? (
+              <>
+                <p>
+                  Audit-based smoke tests on synthetic scenarios completed before this live test.
+                </p>
+                {[
+                  "Language matching",
+                  "Consent before meeting confirmation",
+                  "Respect do-not-call requests",
+                  "Polite objection handling",
+                ].map((s) => (
+                  <div className="checkpoint-log" key={s}>
+                    <span>{s}</span>
+                    <Pill tone="green">
+                      <Check size={11} />
+                      Passed
+                    </Pill>
+                  </div>
+                ))}
+                <Note>Illustrative pre-prod evaluations · no production audits.</Note>
+              </>
+            ) : step === 3 ? (
+              <Evidence />
+            ) : step === 4 ? (
+              <>
+                <Evidence />
+                <Button asChild variant="outline">
+                  <Link to="/scorecard">Review decision</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <p>
+                  No version has been promoted. Keep the baseline until the decision is supported by
+                  evidence.
+                </p>
+                <Button asChild variant="outline" className="mt-5">
+                  <Link to="/scale-up">
+                    View segment map
+                    <ArrowUpRight />
+                  </Link>
+                </Button>
+              </>
+            )}
+          </div>
+          <div className="optional-step">
+            <span>
+              Digital twin · multi-turn simulation <Pill>Optional / later</Pill>
+            </span>
+            <Button variant="ghost" size="sm" onClick={() => setOptional(!optional)}>
+              {optional ? "Skipped" : "Skip step"}
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          {stop && (
+            <div className="early-banner">
+              <div>
+                <h3>
+                  Early stop · Version B is paused <Pill tone="amber">Simulated data</Pill>
+                </h3>
+                <p>
+                  Its traffic has returned to the baseline. No real calls or decisions were
+                  affected.
+                </p>
+              </div>
+              <Button variant="link" size="sm" onClick={() => setEvidence(true)}>
+                See evidence
+                <ArrowUpRight />
+              </Button>
+            </div>
+          )}
+          <div className="section-heading">
+            <div>
+              <div className="section-kicker">
+                <h2>Your voices, in the field</h2>
+                <Pill tone={paused ? "neutral" : "green"}>{paused ? "Paused" : "Live test"}</Pill>
+              </div>
+              <p>Three versions. One hypothesis. Every conversation counts.</p>
+            </div>
+            <span className="sarvam">
+              Powered by <AudioLines size={15} />
+              <strong>sarvam</strong>
+            </span>
+          </div>
+          <div className="version-cards">
+            {versions.map((v) => (
+              <article
+                key={v.id}
+                className={`version-card version-${v.id} ${selected === v.id ? "selected" : ""} ${stop && v.id === "B" ? "stopped" : ""}`}
+              >
+                <div className="mascot-stage">
+                  <div className="card-top">
+                    <span className="version-letter">{v.id}</span>
+                    <span className="card-live">
+                      <i className={!paused && !(stop && v.id === "B") ? "live-dot" : ""} />
+                      {stop && v.id === "B" ? "Stopped" : paused ? "Paused" : "Live"}
+                    </span>
+                  </div>
+                  <div onClick={() => setSelected(selected === v.id ? null : v.id)}>
+                    <Mascot
+                      directions={v.directions}
+                      reactions={v.reactions}
+                      size={142}
+                      label={`Select Version ${v.id} mascot`}
+                    />
+                  </div>
+                </div>
+                <div className="version-info">
+                  <div className="version-name">
+                    <span>Version {v.id}</span>
+                    <span>{v.name}</span>
+                    {v.id === "A" && <Pill>Baseline</Pill>}
+                  </div>
+                  <p className="version-description">{v.title}</p>
+                  <div className="version-activity">
+                    <Activity size={14} />
+                    <span>
+                      {paused
+                        ? "Calls paused"
+                        : stop && v.id === "B"
+                          ? "Traffic returned to A"
+                          : `${stop && v.id === "A" ? 20 : v.active} calls in progress`}
+                    </span>
+                    <span className="sparkline" aria-hidden="true">
+                      {Array.from({ length: 12 }, (_, i) => (
+                        <i key={i} />
+                      ))}
+                    </span>
+                  </div>
+                  <div className="version-stats">
+                    <div>
+                      <small>Calls answered</small>
+                      <strong>{v.calls.toLocaleString()}</strong>
+                    </div>
+                    <div>
+                      <small>Meeting Fixed rate</small>
+                      <strong>
+                        {stop && v.id === "B" ? "7.1" : v.rate}%
+                        {v.id === "B" && !stop && <span>↗</span>}
+                      </strong>
+                    </div>
+                  </div>
+                  <Regression />
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="live-summary">
+            <div className="summary-stat">
+              <small>
+                <Phone size={12} />
+                Calls placed
+              </small>
+              <strong>5,248</strong>
+              <span>across all versions</span>
+            </div>
+            <div className="summary-stat">
+              <small>
+                <PhoneIncoming size={12} />
+                Answered
+              </small>
+              <strong>3,668</strong>
+              <span>69.9% answer rate</span>
+            </div>
+            <div className="summary-stat">
+              <small>
+                <AudioLines size={12} />
+                In progress
+              </small>
+              <strong>{paused ? 0 : 26}</strong>
+              <span>right now</span>
+            </div>
+            <div>
+              <div className="traffic-heading">
+                <span>Traffic split</span>
+                <Pill tone="green">
+                  <ShieldCheck size={11} />
+                  Split valid
+                </Pill>
+              </div>
+              <div className={`traffic-bars ${stop ? "stopped" : ""}`}>
+                <span className="a" />
+                <span className="b" />
+                <span className="c" />
+              </div>
+              <div className="traffic-legend">
+                <span className="version-A">
+                  <i className="legend-dot" />A · {stop ? "75" : "50"}%
+                </span>
+                <span className="version-B">
+                  <i className="legend-dot" />B · {stop ? "0" : "25"}%
+                </span>
+                <span className="version-C">
+                  <i className="legend-dot" />C · 25%
+                </span>
+                <span>
+                  On target
+                  <Check size={10} />
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="results-header">
+            <div>
+              <h2>
+                Signals worth watching <Pill>Sample data</Pill>
+              </h2>
+              <p>Significant results, plus your primary metric as it collects evidence.</p>
+            </div>
+            <div className="results-actions">
+              <Button variant="ghost" size="sm" onClick={() => setAll(!all)}>
+                {all ? "Hide internal metrics" : `Show all metrics (${internal.length} hidden)`}
+                <ChevronDown />
+              </Button>
+              <Button variant="outline" size="icon" title="Export results" onClick={exportResults}>
+                <ArrowDownToLine />
+              </Button>
+            </div>
+          </div>
+          {selected && (
+            <div className="selected-filter mb-3">
+              Filtered to Version {selected}
+              <Button
+                size="icon"
+                variant="ghost"
+                title="Clear version filter"
+                onClick={() => setSelected(null)}
+              >
+                <X />
+              </Button>
+            </div>
+          )}
+          {view !== "ready" ? (
+            <EmptyState state={view} onRetry={() => setView("ready")} />
+          ) : (
+            <div className="results-table-wrap">
+              <table className="data-table results-table">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    {versions
+                      .filter((v) => !selected || v.id === selected)
+                      .map((v) => (
+                        <th key={v.id}>
+                          <span className="version-letter">{v.id}</span>
+                          {v.id === "A" ? "Baseline" : `Version ${v.id}`}
+                        </th>
+                      ))}
+                    <th>Difference vs A</th>
+                    <th>Evidence</th>
+                    <th>Verdict</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map((r) => (
+                    <tr key={r.metric}>
+                      <td className="metric-cell">
+                        {r.metric}
+                        {r.primary && <small>PRIMARY METRIC</small>}
+                      </td>
+                      {r.values.map(
+                        (v, i) =>
+                          (!selected || selected === versions[i]?.id) && (
+                            <td className={i === 1 ? "primary-value" : ""} key={i}>
+                              {stop && i === 1 && r.primary ? "7.1%" : v}
+                            </td>
+                          ),
+                      )}
+                      <td className={stop && r.primary ? "negative" : "positive"}>
+                        {stop && r.primary ? "−4.4 pp" : r.delta}
+                      </td>
+                      <td>
+                        <span className={r.tone === "green" ? "positive" : "neutral-text"}>
+                          {r.tone === "green" && <Check size={11} className="inline mr-1" />}
+                          {r.significance}
+                        </span>
+                      </td>
+                      <td>
+                        <Pill tone={stop && r.primary ? "red" : r.tone}>
+                          {stop && r.primary ? "B stopped" : r.verdict}
+                        </Pill>
+                      </td>
+                    </tr>
+                  ))}
+                  {all &&
+                    internal.map((m, i) => (
+                      <tr key={m}>
+                        <td className="metric-cell">
+                          {m}
+                          <small>INTERNAL / DEBUG</small>
+                        </td>
+                        {versions
+                          .filter((v) => !selected || selected === v.id)
+                          .map((v) => (
+                            <td key={v.id}>
+                              {(12.1 + i + (v.id === "B" ? -0.4 : 0.2)).toFixed(1)}
+                              {m.includes("count") ? "" : "%"}
+                            </td>
+                          ))}
+                        <td className="neutral-text">No real difference</td>
+                        <td>Not significant</td>
+                        <td>
+                          <Pill>Inconclusive</Pill>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <div className="table-footer">
+            <span>
+              <Clock size={11} />
+              Last updated just now <span>·</span> Synthetic test data
+            </span>
+            <select
+              className="state-select"
+              aria-label="Result preview state"
+              value={view}
+              onChange={(e) => setView(e.target.value)}
+            >
+              <option value="ready">Results available</option>
+              <option value="empty">Empty state</option>
+              <option value="loading">Loading state</option>
+              <option value="error">Error state</option>
+            </select>
+          </div>
+          <div className="early-stop-section">
+            <div>
+              <FlaskConical size={18} />
+              <div>
+                <h3>
+                  A safety net, not a leap of faith. <Pill>Simulated data</Pill>
+                </h3>
+                <p>See how an early stop protects the baseline when a variant gets worse.</p>
+              </div>
+            </div>
+            {demo === "idle" ? (
+              <Button variant="outline" onClick={() => setDemo("running")}>
+                <Play />
+                Simulate a worse variant
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                disabled={demo === "running"}
+                onClick={() => setDemo("idle")}
+              >
+                {demo === "running" ? <Activity /> : <RotateCcw />}
+                {demo === "running" ? "Collecting simulated evidence…" : "Reset demo"}
+              </Button>
+            )}
+          </div>
+        </>
+      )}
+      <Modal
+        open={evidence}
+        onOpenChange={setEvidence}
+        title={stop ? "Early-stop evidence · Simulated data" : "Experiment evidence"}
+      >
+        {stop ? (
+          <>
+            <div className="form-summary">
+              <span>Version B meeting fixed rate</span>
+              <strong>7.1% vs baseline 11.5%</strong>
+            </div>
+            <div className="pending-slot">
+              Early-stop rule: pending product definition. This demonstration illustrates an
+              early-stop transition, not an approved statistical boundary.
+            </div>
+            <Note>All evidence and traffic changes in this sequence are simulated.</Note>
+          </>
+        ) : (
+          <Evidence />
+        )}
+      </Modal>
+    </>
+  );
+}
