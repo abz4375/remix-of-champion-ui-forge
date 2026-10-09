@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { PageTitle, Pill, Avatar, Modal, Note } from "./common";
 import { versions, promptText } from "./data";
+import { DiffView } from "./diff";
 type PromptVersion = { id: string; title: string; status: string; text: string; note: string };
 export function Prompts() {
   const [list, setList] = useState<PromptVersion[]>(
@@ -285,29 +286,13 @@ export function Prompts() {
               </option>
             ))}
         </select>
-        <div className="diff-grid">
-          <div>
-            <h3>Version {compareId}</h3>
-            <pre>{list.find((v) => v.id === compareId)?.text}</pre>
-          </div>
-          <div>
-            <h3>Version {id}</h3>
-            <pre>
-              {text.split("\n").map((line, i) => (
-                <span
-                  key={i}
-                  className={
-                    !list.find((v) => v.id === compareId)?.text.includes(line) ? "diff-added" : ""
-                  }
-                >
-                  {line}
-                  {"\n"}
-                </span>
-              ))}
-            </pre>
-          </div>
-        </div>
-        <Note>Highlighted lines are additions relative to the selected version.</Note>
+        <DiffView
+          a={list.find((v) => v.id === compareId)?.text || ""}
+          b={text}
+          aTitle={`Version ${compareId}`}
+          bTitle={`Version ${id}`}
+        />
+        <Note>Added lines are highlighted relative to the selected version.</Note>
       </Modal>
       <Modal open={history} onOpenChange={setHistory} title="Version history">
         {list

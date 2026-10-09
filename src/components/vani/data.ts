@@ -1,21 +1,22 @@
-import fox from "@/assets/vani-a.png";
-import otter from "@/assets/vani-b.png";
-import owl from "@/assets/vani-c.png";
-import foxDirections from "@/assets/fox-directions.webp";
-import foxReactions from "@/assets/fox-reactions.webp";
-import otterDirections from "@/assets/otter-directions.webp";
-import otterReactions from "@/assets/otter-reactions.webp";
-import owlDirections from "@/assets/owl-directions.webp";
-import owlReactions from "@/assets/owl-reactions.webp";
+import vaniA from "@/assets/vani-a.png";
+import vaniB from "@/assets/vani-b.png";
+import vaniC from "@/assets/vani-c.png";
+import aDirections from "@/assets/fox-directions.webp";
+import aReactions from "@/assets/fox-reactions.webp";
+import bDirections from "@/assets/otter-directions.webp";
+import bReactions from "@/assets/otter-reactions.webp";
+import cDirections from "@/assets/owl-directions.webp";
+import cReactions from "@/assets/owl-reactions.webp";
+
 export const versions = [
   {
     id: "A",
     name: "Vani A",
     title: "Current production prompt",
     status: "Live",
-    image: fox,
-    directions: foxDirections,
-    reactions: foxReactions,
+    image: vaniA,
+    directions: aDirections,
+    reactions: aReactions,
     calls: 1842,
     active: 12,
     rate: 11.5,
@@ -28,9 +29,9 @@ export const versions = [
     name: "Vani B",
     title: "Shorter opening, direct meeting ask",
     status: "In test",
-    image: otter,
-    directions: otterDirections,
-    reactions: otterReactions,
+    image: vaniB,
+    directions: bDirections,
+    reactions: bReactions,
     calls: 916,
     active: 8,
     rate: 13.2,
@@ -43,9 +44,9 @@ export const versions = [
     name: "Vani C",
     title: "Hinglish-first greeting",
     status: "In test",
-    image: owl,
-    directions: owlDirections,
-    reactions: owlReactions,
+    image: vaniC,
+    directions: cDirections,
+    reactions: cReactions,
     calls: 910,
     active: 6,
     rate: 9.8,
@@ -54,6 +55,34 @@ export const versions = [
     answer: 66.1,
   },
 ];
+
+export const goals = [
+  {
+    id: "meeting-fixed",
+    label: "Meeting Fixed",
+    desc: "Sellers who agree to a follow-up meeting",
+    baseline: "now 10.6%",
+  },
+  {
+    id: "online-meeting",
+    label: "Online Meeting Fixed",
+    desc: "Meetings booked for an online discussion",
+    baseline: "now 3.2%",
+  },
+  {
+    id: "callback",
+    label: "Callback Requested",
+    desc: "Sellers who ask us to call back later",
+    baseline: "now 7.4%",
+  },
+  {
+    id: "custom",
+    label: "Custom goal",
+    desc: "Define it + give 2-3 example calls",
+    baseline: null,
+  },
+];
+
 export const secondary = [
   "Call duration (seconds)",
   "Answer rate",
@@ -78,6 +107,10 @@ export const internal = [
   "Objection mix",
 ];
 export const promptText = `# VANI · Seller meeting assistant\n\n## Your role\nYou are VANI, a friendly voice assistant from IndiaMART.\nSpeak naturally in English, Hindi, or Hinglish.\nMatch the seller’s language and keep each turn short.\n\n## Opening\n“Namaste! Main IndiaMART se VANI bol rahi hoon.\nKya abhi baat karne ka sahi samay hai?”\n\n## Understand the business\nAsk which products the seller currently supplies.\nListen without interrupting. Confirm their location.\n\n## Offer a meeting\nAsk if they would like to meet an IndiaMART executive\nto discuss relevant business opportunities.\nConfirm a preferred date and time before booking.\n\n## Respect the seller\nIf not interested, acknowledge politely and end the call.\nNever imply a meeting is booked without explicit consent.\nIf asked not to call, respect that request immediately.\n\n## Closing\nSummarise the agreed next step. Thank the seller.\n“Dhanyavaad, aapka din achha rahe!”`;
+
+export const controlPrompt = promptText;
+export const variantPrompt = `# VANI · Seller meeting assistant\n\n## Your role\nYou are VANI, a friendly voice assistant from IndiaMART.\nSpeak naturally in English, Hindi, or Hinglish.\n\n## Opening\n“Namaste! Main IndiaMART se VANI bol rahi hoon.\nKya abhi baat karne ka sahi samay hai?”\nOpen with one short greeting line only.\n\n## Understand the business\nAsk which products the seller currently supplies.\nListen without interrupting. Confirm their location.\n\n## Offer a meeting\nAsk for the meeting in the first thirty seconds.\nIf the seller hesitates, offer a callback instead.\nAsk if they would like to meet an IndiaMART executive\nto discuss relevant business opportunities.\nConfirm a preferred date and time before booking.\n\n## Respect the seller\nIf not interested, acknowledge politely and end the call.\nNever imply a meeting is booked without explicit consent.\nIf asked not to call, respect that request immediately.\n\n## Closing\nSummarise the agreed next step. Thank the seller.\n“Dhanyavaad, aapka din achha rahe!”`;
+
 export function metadata(title: string, description: string) {
   return {
     meta: [

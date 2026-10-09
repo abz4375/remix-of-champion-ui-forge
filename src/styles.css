@@ -2292,3 +2292,249 @@
   background: var(--overlay);
   backdrop-filter: blur(3px);
 }
+
+/* Goal + change setup screen */
+.exp-name-wrap {
+  margin-bottom: 26px;
+}
+.exp-name-wrap .eyebrow {
+  display: block;
+  margin-bottom: 6px;
+}
+.exp-name-input {
+  font-size: 22px;
+  font-weight: 700;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  width: 100%;
+  color: var(--foreground);
+  padding: 2px 0;
+}
+.exp-name-input:focus {
+  border-bottom-color: var(--primary);
+}
+.exp-name-input:disabled {
+  color: var(--muted-foreground);
+}
+.setup-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  padding: 26px;
+  margin-bottom: 18px;
+}
+.setup-card > h2 {
+  font-size: 16px;
+}
+.setup-card > .helper {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  margin-top: 7px;
+  margin-bottom: 20px;
+}
+.goal-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.goal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  padding: 16px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+  font-family: inherit;
+}
+.goal-card:hover {
+  border-color: color-mix(in oklch, var(--primary) 40%, var(--border));
+}
+.goal-card.selected {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+.goal-card.custom {
+  border-style: dashed;
+}
+.goal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+.goal-head strong {
+  font-size: 12px;
+}
+.goal-card > span {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+.goal-card.selected > span {
+  color: var(--foreground);
+}
+.chip-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.diff-view {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--card);
+}
+.diff-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--secondary);
+  flex-wrap: wrap;
+}
+.diff-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+}
+.diff-title strong {
+  font-weight: 650;
+}
+.diff-chips {
+  display: flex;
+  gap: 6px;
+}
+.diff-body {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  max-height: 420px;
+  overflow: auto;
+}
+.diff-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.diff-cell {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px;
+  line-height: 2;
+  min-width: 0;
+}
+.diff-cell.stacked {
+  flex-direction: column;
+  padding-block: 8px;
+}
+.diff-line {
+  display: flex;
+  gap: 8px;
+}
+.diff-cell.del {
+  background: var(--destructive-soft);
+}
+.diff-cell.add {
+  background: var(--success-soft);
+}
+.diff-no {
+  width: 20px;
+  text-align: right;
+  color: var(--muted-foreground);
+  opacity: 0.6;
+  user-select: none;
+  flex-shrink: 0;
+}
+.diff-marker {
+  width: 10px;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+.diff-cell.del .diff-marker {
+  color: var(--destructive);
+}
+.diff-cell.add .diff-marker {
+  color: var(--success);
+}
+.diff-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.diff-cell.edit-cell {
+  padding: 0;
+}
+.diff-editor {
+  width: 100%;
+  min-height: 380px;
+  border: 0;
+  resize: vertical;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 2;
+  padding: 8px 12px;
+  color: var(--foreground);
+}
+.why-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+.why-row svg {
+  color: var(--star);
+}
+.why-input {
+  flex: 1;
+  min-width: 180px;
+  border: 0;
+  border-bottom: 1px dashed var(--border);
+  background: transparent;
+  font-size: 11px;
+  padding: 4px 2px;
+  color: var(--foreground);
+}
+.why-input:focus {
+  outline: none;
+  border-bottom-color: var(--primary);
+}
+@media (max-width: 1100px) {
+  .goal-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .diff-row {
+    grid-template-columns: 1fr;
+  }
+  .diff-cell.stacked {
+    padding-block: 4px;
+  }
+}
+@media (max-width: 760px) {
+  .exp-name-input {
+    font-size: 17px;
+  }
+  .setup-card {
+    padding: 18px;
+  }
+  .diff-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
