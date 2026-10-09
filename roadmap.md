@@ -8,4 +8,6 @@
 - [x] Scorecard, comparison, evidence and decision states
 - [x] Scale-up wizard and segment map
 - [x] Alerts, settings and accessible interactions
-- [x] Browser verification and final checks
+- [x] Browser verification and final checks# VANI Lab UI — follow-up
+- [x] Goal + change screen per product team spec (goal cards, watch chips, diff checker, 4-step frame, env pill)
+- [x] Mascot animations calmed: static frames, no rotation/squeeze (blink optional later)

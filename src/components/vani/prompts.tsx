@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { PageTitle, Pill, Avatar, Modal, Note } from "./common";
 import { versions, promptText } from "./data";
+import { DiffView } from "./diff";
 type PromptVersion = { id: string; title: string; status: string; text: string; note: string };
 export function Prompts() {
   const [list, setList] = useState<PromptVersion[]>(

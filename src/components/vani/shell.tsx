@@ -153,6 +153,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <i className="live-dot" />
             Live
           </Pill>
+          <Pill tone="blue">Traffic: simulated sellers (Sarvam)</Pill>
           <div className="topbar-right">
             <span className="sample-label">Synthetic data</span>
             <Button
