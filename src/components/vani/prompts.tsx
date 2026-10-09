@@ -39,7 +39,10 @@ export function Prompts() {
     const lower = text.toLowerCase();
     let at = lower.indexOf(query.toLowerCase(), editor.selectionEnd);
     if (at < 0) at = lower.indexOf(query.toLowerCase());
-    if (at < 0) { toast("No matching text"); return; }
+    if (at < 0) {
+      toast("No matching text");
+      return;
+    }
     editor.focus();
     editor.setSelectionRange(at, at + query.length);
     editor.scrollTop = Math.max(0, (text.slice(0, at).split("\n").length - 4) * 24);
@@ -191,14 +194,18 @@ export function Prompts() {
                 placeholder="Find in prompt…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") findNext(); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") findNext();
+                }}
               />
               <span>
                 {query
                   ? `${text.toLowerCase().split(query.toLowerCase()).length - 1} matches`
                   : "Type to search"}
               </span>
-              <Button variant="outline" size="sm" disabled={!query} onClick={findNext}>Next match</Button>
+              <Button variant="outline" size="sm" disabled={!query} onClick={findNext}>
+                Next match
+              </Button>
             </div>
           )}
           <div className="editor-body">

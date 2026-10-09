@@ -36,24 +36,30 @@ const raw: Record<string, number[]> = {
 };
 function Rating({ value, rawValue, calls }: { value: number; rawValue: string; calls: number }) {
   return (
-    <TooltipProvider delayDuration={150}><Tooltip><TooltipTrigger asChild>
-    <span className="rating-cell" tabIndex={0} aria-label={`${value} out of 5, ${rawValue}`}>
-      <span className="star-rating">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <Star key={i} className={i <= Math.round(value) ? "" : "empty"} />
-        ))}
-        <strong>{value.toFixed(1)}</strong>
-      </span>
-    </span></TooltipTrigger><TooltipContent className="rating-tooltip" side="top">
-        <strong>{rawValue}</strong>
-        <div className="ci-bar" />
-        <small>Illustrative interval · confidence pending</small>
-        <div className="sample-progress">
-          <span className={calls >= 1500 ? "progress-A" : "progress-B"} />
-        </div>
-        <small>{calls.toLocaleString()} / 1,500 calls needed</small>
-        <small>Star mapping is a product placeholder.</small>
-      </TooltipContent></Tooltip></TooltipProvider>
+    <TooltipProvider delayDuration={150}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="rating-cell" tabIndex={0} aria-label={`${value} out of 5, ${rawValue}`}>
+            <span className="star-rating">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star key={i} className={i <= Math.round(value) ? "" : "empty"} />
+              ))}
+              <strong>{value.toFixed(1)}</strong>
+            </span>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent className="rating-tooltip" side="top">
+          <strong>{rawValue}</strong>
+          <div className="ci-bar" />
+          <small>Illustrative interval · confidence pending</small>
+          <div className="sample-progress">
+            <span className={calls >= 1500 ? "progress-A" : "progress-B"} />
+          </div>
+          <small>{calls.toLocaleString()} / 1,500 calls needed</small>
+          <small>Star mapping is a product placeholder.</small>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 export function Scorecard() {
