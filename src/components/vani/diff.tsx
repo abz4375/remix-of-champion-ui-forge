@@ -71,7 +71,7 @@ export function DiffView({
   onBChange?: (value: string) => void;
   lockA?: boolean;
 }) {
-  const rows = diffRows(a, b);
+  const editing = mode === "edit" && !!onBChange;
   return (
     <div className="diff-view">
       <div className="diff-head">
@@ -81,34 +81,42 @@ export function DiffView({
         </div>
         <div className="diff-title">
           <strong>{bTitle}</strong>
-          <Pill tone={mode === "edit" ? "amber" : "blue"}>
-            {mode === "edit" ? "editing" : "editable"}
-          </Pill>
+          <Pill tone={editing ? "amber" : "blue"}>{editing ? "editing" : "editable"}</Pill>
         </div>
       </div>
-      <div className="diff-body">
-        {rows.map((row, index) => (
-          <div className="diff-row" key={index}>
-            <div className={`diff-cell ${row.kind === "del" ? "del" : ""}`}>
-              {row.kind !== "add" && (
-                <>
-                  <span className="diff-no">{row.leftNo}</span>
-                  <span className="diff-marker">{row.kind === "del" ? "−" : ""}</span>
-                  <span className="diff-text">{row.text || " "}</span>
-                </>
-              )}
-            </div>
-            {mode === "edit" && onBChange ? (
-              <div className="diff-cell edit-cell">
-                <textarea
-                  className="diff-editor"
-                  aria-label="Variant prompt editor"
-                  value={b}
-                  onChange={(e) => onBChange(e.target.value)}
-                  spellCheck={false}
-                />
+      {editing ? (
+        <div className="diff-row edit-row">
+          <div className="diff-cell stacked">
+            {a.split("\n").map((line, i) => (
+              <div className="diff-line" key={i}>
+                <span className="diff-no">{i + 1}</span>
+                <span className="diff-text">{line || " "}</span>
               </div>
-            ) : (
+            ))}
+          </div>
+          <div className="diff-cell edit-cell">
+            <textarea
+              className="diff-editor"
+              aria-label="Variant prompt editor"
+              value={b}
+              onChange={(e) => onBChange?.(e.target.value)}
+              spellCheck={false}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="diff-body">
+          {diffRows(a, b).map((row, index) => (
+            <div className="diff-row" key={index}>
+              <div className={`diff-cell ${row.kind === "del" ? "del" : ""}`}>
+                {row.kind !== "add" && (
+                  <>
+                    <span className="diff-no">{row.leftNo}</span>
+                    <span className="diff-marker">{row.kind === "del" ? "−" : ""}</span>
+                    <span className="diff-text">{row.text || " "}</span>
+                  </>
+                )}
+              </div>
               <div className={`diff-cell ${row.kind === "add" ? "add" : ""}`}>
                 {row.kind !== "del" && (
                   <>
@@ -118,10 +126,10 @@ export function DiffView({
                   </>
                 )}
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
