@@ -172,7 +172,9 @@ export function Setup() {
                 disabled={locked}
                 placeholder="Your primary metric"
                 onChange={(e) =>
-                  goal === "custom" ? setCustomGoal(e.target.value) : setPrimaryMetric(e.target.value)
+                  goal === "custom"
+                    ? setCustomGoal(e.target.value)
+                    : setPrimaryMetric(e.target.value)
                 }
               />
               <p className="field-help">This becomes the number the scorecard judges first.</p>
@@ -248,7 +250,9 @@ export function Setup() {
       {step === 1 && (
         <section className="setup-card">
           <h2>Pre-prod gate</h2>
-          <p className="helper">Smoke tests on synthetic scenarios must pass before live traffic.</p>
+          <p className="helper">
+            Smoke tests on synthetic scenarios must pass before live traffic.
+          </p>
           {preprodChecks.map((c) => (
             <div className="checkpoint-log" key={c}>
               <span>{c}</span>
@@ -352,7 +356,9 @@ export function Setup() {
             Promote only with defensible evidence and passing guardrails. The product team will
             finalise the decision rule.
           </div>
-          <Note>Start runs a UI demonstration only. Pre-prod evaluations precede live traffic.</Note>
+          <Note>
+            Start runs a UI demonstration only. Pre-prod evaluations precede live traffic.
+          </Note>
         </section>
       )}
       {error && <p className="validation-error">{error}</p>}
