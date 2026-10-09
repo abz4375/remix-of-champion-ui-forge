@@ -1,11 +1,317 @@
-import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
-import { Lock, ArrowRight, Check, Info } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { PageTitle, Pill, Avatar, Modal, Note } from './common';
-import { versions, secondary, guardrails } from './data';
-import { toast } from 'sonner';
-export function Setup(){const [step,setStep]=useState(0);const [locked,setLocked]=useState(false);const [hypothesis,setHypothesis]=useState('A shorter opening and a direct meeting ask will increase Meeting Fixed rate.');const [metric,setMetric]=useState(false);const [name,setName]=useState('Shorter opening vs baseline');const [primary,setPrimary]=useState('Meeting Fixed rate');const [error,setError]=useState('');const [traffic,setTraffic]=useState('40');const [split,setSplit]=useState('50');const [candidate,setCandidate]=useState(true);const [start,setStart]=useState('2026-10-08T10:00');const [end,setEnd]=useState('2026-10-15T10:00');
-const next=()=>{if(!hypothesis.trim()||!name.trim()){setError('Add an experiment name and hypothesis before continuing.');return}if(end<=start){setError('The end must be after the start.');return}setError('');setStep(Math.min(2,step+1))};
-return <><PageTitle eyebrow="EXPERIMENT / SETUP" title="A good test starts with a clear question." description="Define what changes, who hears it, and what success looks like." action={<Pill tone={locked?'blue':'neutral'}>{locked?<Lock size={11}/>:null}{locked?'Definition locked':'Draft experiment'}</Pill>}/><div className="form-layout">{locked&&<div className="locked-banner"><Lock size={16}/><span>Definition locked. Changes would invalidate the comparison once a test starts.</span></div>}<div className="form-stepper">{['Hypothesis & versions','Traffic & metrics','Review & start'].map((s,i)=><Button variant="ghost" key={s} className={step===i?'active':''} onClick={()=>setStep(i)}><span className="step-number">{i<step?<Check size={11}/>:i+1}</span>{s}</Button>)}</div>{step===0?<><section className="form-section"><h2>What are we testing?</h2><p>One specific change. One measurable outcome.</p><label className="field-label" htmlFor="experiment-name">Experiment name</label><input id="experiment-name" className="form-input mb-5" value={name} disabled={locked} onChange={e=>setName(e.target.value)}/><label className="field-label" htmlFor="hypothesis">Hypothesis</label><textarea id="hypothesis" rows={3} className="form-input" value={hypothesis} disabled={locked} onChange={e=>setHypothesis(e.target.value)}/><p className="field-help">Describe the change and the outcome you expect.</p></section><section className="form-section"><h2>Choose your voices</h2><p>The baseline stays unchanged. Candidates test your new approach.</p>{versions.map(v=><div className="version-select-row" key={v.id}><Avatar id={v.id}/><div><strong>Version {v.id} <Pill tone={v.id==='A'?'neutral':'blue'}>{v.id==='A'?'Baseline':'Candidate'}</Pill></strong><small>{v.title}</small></div>{v.id==='C'?<Switch aria-label="Include Version C" checked={candidate} disabled={locked} onCheckedChange={setCandidate}/>:<select aria-label={`Prompt for Version ${v.id}`} className="form-input" disabled={locked} defaultValue={v.title}><option>{v.title}</option><option>Previous saved prompt · v1</option></select>}</div>)}</section></>:step===1?<><section className="form-section"><h2>Give the test room to learn</h2><p>Keep traffic limited and the test window fixed.</p><div className="field-grid"><div><label className="field-label">Eligible traffic</label><select className="form-input" value={traffic} disabled={locked} onChange={e=>setTraffic(e.target.value)}><option value="20">20% · GLID ending 0–1</option><option value="40">40% · GLID ending 0–3</option><option value="60">60% · GLID ending 0–5</option></select></div><div><label className="field-label">Baseline share</label><select className="form-input" value={split} disabled={locked} onChange={e=>setSplit(e.target.value)}><option value="50">50% baseline · 25% each candidate</option><option value="80">80% baseline · 10% each candidate</option></select></div><div><label className="field-label" htmlFor="start">Start</label><input id="start" type="datetime-local" className="form-input" value={start} disabled={locked} onChange={e=>setStart(e.target.value)}/></div><div><label className="field-label" htmlFor="end">End</label><input id="end" type="datetime-local" className="form-input" value={end} disabled={locked} onChange={e=>setEnd(e.target.value)}/></div></div><p className="field-help">All times IST · each ending digit is approximately 10% of eligible traffic.</p></section><section className="form-section"><h2>Measure what matters</h2>{[['Primary metric',primary],['Secondary metrics',secondary.join(' · ')],['Guardrails',`${guardrails.length} checks protect seller experience`]].map(([label,value])=><div key={label} className="metric-summary"><div><strong>{label}</strong><small>{value}</small></div><Button variant="ghost" onClick={()=>setMetric(true)} disabled={locked}>Edit<ArrowRight/></Button></div>)}</section><section className="form-section"><h2>Decision method <Pill>Pending definition</Pill></h2><div className="pending-slot">Promote only with defensible evidence and passing guardrails. The product team will finalise the decision rule.</div></section></>:<><section className="form-section"><h2>One final look</h2><p>Starting this experiment locks its definition. This prototype does not place calls.</p>{[['Experiment',name],['Hypothesis',hypothesis],['Versions',candidate?'A baseline · B & C candidates':'A baseline · B candidate'],['Eligible traffic',`${traffic}% of calls · GLID ending digits`],['Split',`${split}% A · ${100-Number(split)}% candidates`],['Window',`${start.replace('T',' ')} → ${end.replace('T',' ')} IST`],['Primary metric',primary],['Decision method','Pending product approval']].map(([label,value])=><div className="form-summary" key={label}><span>{label}</span><strong className="max-w-[65%] text-right">{value}</strong></div>)}</section><Note>Start runs a UI demonstration only. Pre-prod evaluations precede live traffic.</Note></>}{error&&<p className="validation-error">{error}</p>}<div className="form-actions"><Button variant="outline" disabled={step===0} onClick={()=>setStep(step-1)}>Back</Button>{step<2?<Button onClick={next}>Continue<ArrowRight/></Button>:locked?<Button asChild><Link to="/">View live pipeline<ArrowRight/></Link></Button>:<Button onClick={()=>{setLocked(true);toast.success('Demo experiment started · definition locked')}}><Lock/>Review and start</Button>}</div></div><Modal open={metric} onOpenChange={setMetric} title="Experiment metrics" description="Choose a primary metric from the fixed metric set."><label className="field-label">Primary metric</label><select className="form-input" value={primary} onChange={e=>setPrimary(e.target.value)}>{['Meeting Fixed rate',...secondary,...guardrails].map(m=><option key={m}>{m}</option>)}</select>{[...secondary,...guardrails].map(m=><label className="setting-row" key={m}><span>{m}</span><Switch defaultChecked/></label>)}<Button onClick={()=>{setMetric(false);toast.success('Demo metrics updated')}}>Save metrics</Button></Modal></>}
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Lock, ArrowRight, Check, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { PageTitle, Pill, Avatar, Modal, Note } from "./common";
+import { versions, secondary, guardrails } from "./data";
+import { toast } from "sonner";
+export function Setup() {
+  const [step, setStep] = useState(0);
+  const [locked, setLocked] = useState(false);
+  const [hypothesis, setHypothesis] = useState(
+    "A shorter opening and a direct meeting ask will increase Meeting Fixed rate.",
+  );
+  const [metric, setMetric] = useState(false);
+  const [name, setName] = useState("Shorter opening vs baseline");
+  const [primary, setPrimary] = useState("Meeting Fixed rate");
+  const [error, setError] = useState("");
+  const [traffic, setTraffic] = useState("40");
+  const [split, setSplit] = useState("50");
+  const [candidate, setCandidate] = useState(true);
+  const [start, setStart] = useState("2026-10-08T10:00");
+  const [end, setEnd] = useState("2026-10-15T10:00");
+  const next = () => {
+    if (!hypothesis.trim() || !name.trim()) {
+      setError("Add an experiment name and hypothesis before continuing.");
+      return;
+    }
+    if (end <= start) {
+      setError("The end must be after the start.");
+      return;
+    }
+    setError("");
+    setStep(Math.min(2, step + 1));
+  };
+  return (
+    <>
+      <PageTitle
+        eyebrow="EXPERIMENT / SETUP"
+        title="A good test starts with a clear question."
+        description="Define what changes, who hears it, and what success looks like."
+        action={
+          <Pill tone={locked ? "blue" : "neutral"}>
+            {locked ? <Lock size={11} /> : null}
+            {locked ? "Definition locked" : "Draft experiment"}
+          </Pill>
+        }
+      />
+      <div className="form-layout">
+        {locked && (
+          <div className="locked-banner">
+            <Lock size={16} />
+            <span>
+              Definition locked. Changes would invalidate the comparison once a test starts.
+            </span>
+          </div>
+        )}
+        <div className="form-stepper">
+          {["Hypothesis & versions", "Traffic & metrics", "Review & start"].map((s, i) => (
+            <Button
+              variant="ghost"
+              key={s}
+              className={step === i ? "active" : ""}
+              onClick={() => setStep(i)}
+            >
+              <span className="step-number">{i < step ? <Check size={11} /> : i + 1}</span>
+              {s}
+            </Button>
+          ))}
+        </div>
+        {step === 0 ? (
+          <>
+            <section className="form-section">
+              <h2>What are we testing?</h2>
+              <p>One specific change. One measurable outcome.</p>
+              <label className="field-label" htmlFor="experiment-name">
+                Experiment name
+              </label>
+              <input
+                id="experiment-name"
+                className="form-input mb-5"
+                value={name}
+                disabled={locked}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <label className="field-label" htmlFor="hypothesis">
+                Hypothesis
+              </label>
+              <textarea
+                id="hypothesis"
+                rows={3}
+                className="form-input"
+                value={hypothesis}
+                disabled={locked}
+                onChange={(e) => setHypothesis(e.target.value)}
+              />
+              <p className="field-help">Describe the change and the outcome you expect.</p>
+            </section>
+            <section className="form-section">
+              <h2>Choose your voices</h2>
+              <p>The baseline stays unchanged. Candidates test your new approach.</p>
+              {versions.map((v) => (
+                <div className="version-select-row" key={v.id}>
+                  <Avatar id={v.id} />
+                  <div>
+                    <strong>
+                      Version {v.id}{" "}
+                      <Pill tone={v.id === "A" ? "neutral" : "blue"}>
+                        {v.id === "A" ? "Baseline" : "Candidate"}
+                      </Pill>
+                    </strong>
+                    <small>{v.title}</small>
+                  </div>
+                  {v.id === "C" ? (
+                    <Switch
+                      aria-label="Include Version C"
+                      checked={candidate}
+                      disabled={locked}
+                      onCheckedChange={setCandidate}
+                    />
+                  ) : (
+                    <select
+                      aria-label={`Prompt for Version ${v.id}`}
+                      className="form-input"
+                      disabled={locked}
+                      defaultValue={v.title}
+                    >
+                      <option>{v.title}</option>
+                      <option>Previous saved prompt · v1</option>
+                    </select>
+                  )}
+                </div>
+              ))}
+            </section>
+          </>
+        ) : step === 1 ? (
+          <>
+            <section className="form-section">
+              <h2>Give the test room to learn</h2>
+              <p>Keep traffic limited and the test window fixed.</p>
+              <div className="field-grid">
+                <div>
+                  <label className="field-label">Eligible traffic</label>
+                  <select
+                    className="form-input"
+                    value={traffic}
+                    disabled={locked}
+                    onChange={(e) => setTraffic(e.target.value)}
+                  >
+                    <option value="20">20% · GLID ending 0–1</option>
+                    <option value="40">40% · GLID ending 0–3</option>
+                    <option value="60">60% · GLID ending 0–5</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="field-label">Baseline share</label>
+                  <select
+                    className="form-input"
+                    value={split}
+                    disabled={locked}
+                    onChange={(e) => setSplit(e.target.value)}
+                  >
+                    <option value="50">50% baseline · 25% each candidate</option>
+                    <option value="80">80% baseline · 10% each candidate</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="start">
+                    Start
+                  </label>
+                  <input
+                    id="start"
+                    type="datetime-local"
+                    className="form-input"
+                    value={start}
+                    disabled={locked}
+                    onChange={(e) => setStart(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="end">
+                    End
+                  </label>
+                  <input
+                    id="end"
+                    type="datetime-local"
+                    className="form-input"
+                    value={end}
+                    disabled={locked}
+                    onChange={(e) => setEnd(e.target.value)}
+                  />
+                </div>
+              </div>
+              <p className="field-help">
+                All times IST · each ending digit is approximately 10% of eligible traffic.
+              </p>
+            </section>
+            <section className="form-section">
+              <h2>Measure what matters</h2>
+              {[
+                ["Primary metric", primary],
+                ["Secondary metrics", secondary.join(" · ")],
+                ["Guardrails", `${guardrails.length} checks protect seller experience`],
+              ].map(([label, value]) => (
+                <div key={label} className="metric-summary">
+                  <div>
+                    <strong>{label}</strong>
+                    <small>{value}</small>
+                  </div>
+                  <Button variant="ghost" onClick={() => setMetric(true)} disabled={locked}>
+                    Edit
+                    <ArrowRight />
+                  </Button>
+                </div>
+              ))}
+            </section>
+            <section className="form-section">
+              <h2>
+                Decision method <Pill>Pending definition</Pill>
+              </h2>
+              <div className="pending-slot">
+                Promote only with defensible evidence and passing guardrails. The product team will
+                finalise the decision rule.
+              </div>
+            </section>
+          </>
+        ) : (
+          <>
+            <section className="form-section">
+              <h2>One final look</h2>
+              <p>
+                Starting this experiment locks its definition. This prototype does not place calls.
+              </p>
+              {[
+                ["Experiment", name],
+                ["Hypothesis", hypothesis],
+                [
+                  "Versions",
+                  candidate ? "A baseline · B & C candidates" : "A baseline · B candidate",
+                ],
+                ["Eligible traffic", `${traffic}% of calls · GLID ending digits`],
+                ["Split", `${split}% A · ${100 - Number(split)}% candidates`],
+                ["Window", `${start.replace("T", " ")} → ${end.replace("T", " ")} IST`],
+                ["Primary metric", primary],
+                ["Decision method", "Pending product approval"],
+              ].map(([label, value]) => (
+                <div className="form-summary" key={label}>
+                  <span>{label}</span>
+                  <strong className="max-w-[65%] text-right">{value}</strong>
+                </div>
+              ))}
+            </section>
+            <Note>
+              Start runs a UI demonstration only. Pre-prod evaluations precede live traffic.
+            </Note>
+          </>
+        )}
+        {error && <p className="validation-error">{error}</p>}
+        <div className="form-actions">
+          <Button variant="outline" disabled={step === 0} onClick={() => setStep(step - 1)}>
+            Back
+          </Button>
+          {step < 2 ? (
+            <Button onClick={next}>
+              Continue
+              <ArrowRight />
+            </Button>
+          ) : locked ? (
+            <Button asChild>
+              <Link to="/">
+                View live pipeline
+                <ArrowRight />
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              onClick={() => {
+                setLocked(true);
+                toast.success("Demo experiment started · definition locked");
+              }}
+            >
+              <Lock />
+              Review and start
+            </Button>
+          )}
+        </div>
+      </div>
+      <Modal
+        open={metric}
+        onOpenChange={setMetric}
+        title="Experiment metrics"
+        description="Choose a primary metric from the fixed metric set."
+      >
+        <label className="field-label">Primary metric</label>
+        <select className="form-input" value={primary} onChange={(e) => setPrimary(e.target.value)}>
+          {["Meeting Fixed rate", ...secondary, ...guardrails].map((m) => (
+            <option key={m}>{m}</option>
+          ))}
+        </select>
+        {[...secondary, ...guardrails].map((m) => (
+          <label className="setting-row" key={m}>
+            <span>{m}</span>
+            <Switch defaultChecked />
+          </label>
+        ))}
+        <Button
+          onClick={() => {
+            setMetric(false);
+            toast.success("Demo metrics updated");
+          }}
+        >
+          Save metrics
+        </Button>
+      </Modal>
+    </>
+  );
+}
