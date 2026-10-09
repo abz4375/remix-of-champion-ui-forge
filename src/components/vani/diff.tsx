@@ -1,4 +1,4 @@
-import { Lock, Pencil, GitCompareArrows } from "lucide-react";
+import { Lock } from "lucide-react";
 import { Pill } from "./common";
 
 type Row = {
@@ -40,6 +40,20 @@ function diffRows(a: string, b: string): Row[] {
   return rows;
 }
 
+export function DiffCounts({ a, b }: { a: string; b: string }) {
+  const rows = diffRows(a, b);
+  const adds = rows.filter((r) => r.kind === "add").length;
+  const dels = rows.filter((r) => r.kind === "del").length;
+  return (
+    <div className="diff-chips">
+      <span className="pill pill-green">+{adds} lines</span>
+      <span className="pill pill-red">
+        −{dels} line{dels === 1 ? "" : "s"}
+      </span>
+    </div>
+  );
+}
+
 export function DiffView({
   a,
   b,
@@ -48,7 +62,6 @@ export function DiffView({
   mode = "diff",
   onBChange,
   lockA = false,
-  showChips = true,
 }: {
   a: string;
   b: string;
@@ -57,11 +70,8 @@ export function DiffView({
   mode?: "diff" | "edit";
   onBChange?: (value: string) => void;
   lockA?: boolean;
-  showChips?: boolean;
 }) {
   const rows = diffRows(a, b);
-  const adds = rows.filter((r) => r.kind === "add").length;
-  const dels = rows.filter((r) => r.kind === "del").length;
   return (
     <div className="diff-view">
       <div className="diff-head">
@@ -69,22 +79,11 @@ export function DiffView({
           <strong>{aTitle}</strong>
           {lockA && <Lock size={12} />}
         </div>
-        {showChips && (
-          <div className="diff-chips">
-            <span className="pill pill-green">+{adds} lines</span>
-            <span className="pill pill-red">−{dels} line{dels === 1 ? "" : "s"}</span>
-          </div>
-        )}
         <div className="diff-title">
           <strong>{bTitle}</strong>
-          {mode === "edit" ? (
-            <Pill tone="amber">editing</Pill>
-          ) : (
-            <Pill tone="blue">editable</Pill>
-          )}
-          {onBChange && mode === "diff" && (
-            <Button-like onClick={() => onBChange(b)} />
-          )}
+          <Pill tone={mode === "edit" ? "amber" : "blue"}>
+            {mode === "edit" ? "editing" : "editable"}
+          </Pill>
         </div>
       </div>
       <div className="diff-body">
@@ -99,13 +98,13 @@ export function DiffView({
                 </>
               )}
             </div>
-            {mode === "edit" ? (
+            {mode === "edit" && onBChange ? (
               <div className="diff-cell edit-cell">
                 <textarea
-                  className="prompt-textarea"
+                  className="diff-editor"
                   aria-label="Variant prompt editor"
                   value={b}
-                  onChange={(e) => onBChange?.(e.target.value)}
+                  onChange={(e) => onBChange(e.target.value)}
                   spellCheck={false}
                 />
               </div>
@@ -124,22 +123,5 @@ export function DiffView({
         ))}
       </div>
     </div>
-  );
-}
-
-function Button-like({ onClick }: { onClick: () => void }) {
-  return (
-    <button type="button" className="diff-edit-toggle" onClick={onClick}>
-      <Pencil size={11} />
-    </button>
-  );
-}
-
-export function DiffEditToggle({ editing, onToggle }: { editing: boolean; onToggle: () => void }) {
-  return (
-    <Button variant="outline" size="sm" onClick={onToggle}>
-      {editing ? <GitCompareArrows /> : <Pencil />}
-      {editing ? "Review diff" : "Edit variant"}
-    </Button>
   );
 }
