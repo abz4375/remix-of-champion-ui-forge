@@ -13,10 +13,10 @@ function diffRows(a: string, b: string): Row[] {
   const y = b.split("\n");
   const n = x.length;
   const m = y.length;
-  const dp: number[][] = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  const dp: number[][] = Array.from({ length: n + 1 }, () => new Array<number>(m + 1).fill(0));
   for (let i = n - 1; i >= 0; i--)
     for (let j = m - 1; j >= 0; j--)
-      dp[i][j] = x[i] === y[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+      dp[i]![j]! = x[i] === y[j] ? dp[i + 1]![j + 1]! + 1 : Math.max(dp[i + 1]![j]!, dp[i]![j + 1]!);
   const rows: Row[] = [];
   let i = 0;
   let j = 0;
@@ -24,19 +24,19 @@ function diffRows(a: string, b: string): Row[] {
   let r = 1;
   while (i < n && j < m) {
     if (x[i] === y[j]) {
-      rows.push({ kind: "ctx", text: x[i], leftNo: l++, rightNo: r++ });
+      rows.push({ kind: "ctx", text: x[i]!, leftNo: l++, rightNo: r++ });
       i++;
       j++;
-    } else if (dp[i + 1][j] >= dp[i][j + 1]) {
-      rows.push({ kind: "del", text: x[i], leftNo: l++ });
+    } else if (dp[i + 1]![j]! >= dp[i]![j + 1]!) {
+      rows.push({ kind: "del", text: x[i]!, leftNo: l++ });
       i++;
     } else {
-      rows.push({ kind: "add", text: y[j], rightNo: r++ });
+      rows.push({ kind: "add", text: y[j]!, rightNo: r++ });
       j++;
     }
   }
-  while (i < n) rows.push({ kind: "del", text: x[i++], leftNo: l++ });
-  while (j < m) rows.push({ kind: "add", text: y[j++], rightNo: r++ });
+  while (i < n) rows.push({ kind: "del", text: x[i++]!, leftNo: l++ });
+  while (j < m) rows.push({ kind: "add", text: y[j++]!, rightNo: r++ });
   return rows;
 }
 

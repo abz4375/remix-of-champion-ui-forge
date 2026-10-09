@@ -183,7 +183,7 @@ export function Setup() {
               <Info size={14} />
               <span>Always watched, so the goal can’t break anything else:</span>
               {guardrails.map((g) => (
-                <Pill key={g} tone={g === atRisk ? "amber" : undefined}>
+                <Pill key={g} tone={g === atRisk ? "amber" : "neutral"}>
                   {g}
                   {g === atRisk ? " · at risk" : ""}
                 </Pill>
