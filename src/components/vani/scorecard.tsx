@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { PageTitle, Pill, Avatar, Modal, Evidence, Note, EmptyState, Regression } from "./common";
 import { versions, secondary, guardrails } from "./data";
@@ -35,6 +36,7 @@ const raw: Record<string, number[]> = {
 };
 function Rating({ value, rawValue, calls }: { value: number; rawValue: string; calls: number }) {
   return (
+    <TooltipProvider delayDuration={150}><Tooltip><TooltipTrigger asChild>
     <span className="rating-cell" tabIndex={0} aria-label={`${value} out of 5, ${rawValue}`}>
       <span className="star-rating">
         {[1, 2, 3, 4, 5].map((i) => (
@@ -42,7 +44,7 @@ function Rating({ value, rawValue, calls }: { value: number; rawValue: string; c
         ))}
         <strong>{value.toFixed(1)}</strong>
       </span>
-      <span className="rating-tooltip">
+    </span></TooltipTrigger><TooltipContent className="rating-tooltip" side="top">
         <strong>{rawValue}</strong>
         <div className="ci-bar" />
         <small>Illustrative interval · confidence pending</small>
@@ -51,8 +53,7 @@ function Rating({ value, rawValue, calls }: { value: number; rawValue: string; c
         </div>
         <small>{calls.toLocaleString()} / 1,500 calls needed</small>
         <small>Star mapping is a product placeholder.</small>
-      </span>
-    </span>
+      </TooltipContent></Tooltip></TooltipProvider>
   );
 }
 export function Scorecard() {

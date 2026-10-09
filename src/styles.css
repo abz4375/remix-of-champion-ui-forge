@@ -1516,22 +1516,13 @@
   outline-offset: 3px;
 }
 .rating-tooltip {
-  position: absolute;
-  left: 0;
-  bottom: 100%;
   width: 230px;
-  z-index: 15;
   background: var(--card);
   border: 1px solid var(--border);
   padding: 15px;
   box-shadow: var(--shadow-panel);
   border-radius: 6px;
-  display: none;
   color: var(--foreground);
-}
-.rating-cell:hover .rating-tooltip,
-.rating-cell:focus .rating-tooltip {
-  display: block;
 }
 .rating-tooltip strong {
   font-size: 10px;
@@ -1960,9 +1951,6 @@
 .score-scroll {
   overflow-x: auto;
   padding-top: 2px;
-}
-.score-scroll:has(.rating-cell:hover) {
-  overflow: visible;
 }
 .help-popover {
   position: relative;
